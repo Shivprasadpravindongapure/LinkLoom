@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
+import cloudinary from "../lib/cloudinary.js";
+import { upsertStreamUser } from "../lib/stream.js";
 
 export async function getRecommendedUsers(req, res) {
   try {
@@ -146,3 +148,75 @@ export async function getOutgoingFriendReqs(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function updateProfile(req, res) {
+  try {
+    const userId = req.user._id;
+    const { fullName, bio, nativeLanguage, learningLanguage, location, image } = req.body;
+
+    let profilePic = req.user.profilePic;
+
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      profilePic = uploadResponse.secure_url;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        fullName: fullName || req.user.fullName,
+        bio: bio || req.user.bio,
+        nativeLanguage: nativeLanguage || req.user.nativeLanguage,
+        learningLanguage: learningLanguage || req.user.learningLanguage,
+        location: location || req.user.location,
+        profilePic,
+      },
+      { new: true }
+    ).select("-password");
+
+    try {
+      await upsertStreamUser({
+        id: updatedUser._id.toString(),
+        name: updatedUser.fullName,
+        image: updatedUser.profilePic || "",
+      });
+      console.log(`Stream user updated after profile picture/details update for ${updatedUser.fullName}`);
+    } catch (streamError) {
+      console.log("Error updating Stream user during profile update:", streamError.message);
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in updateProfile controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function changePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new passwords are required" });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect current password" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error in changePassword controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+

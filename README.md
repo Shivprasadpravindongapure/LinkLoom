@@ -1,8 +1,8 @@
-<h1 align="center">✨ Streamify - Fullstack Chat & Video Calling App ✨</h1>
+<h1 align="center">✨ LinkLoom - Fullstack Chat & Video Calling App ✨</h1>
 
 ![Demo App](/frontend/public/screenshot-for-readme.png)
 
-Streamify is a comprehensive fullstack application built for real-time communication and language exchange. 
+LinkLoom is a comprehensive fullstack application built for real-time communication and language exchange. 
 
 ## 🎯 Project Scope & Requirements
 This application serves as a robust platform for learners to connect, message, and video chat in real-time. 
