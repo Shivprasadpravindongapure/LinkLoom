@@ -47,6 +47,15 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    interests: {
+      type: [String],
+      default: [],
+    },
+    socialLinks: {
+      github: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      portfolio: { type: String, default: "" },
+    },
   },
   { timestamps: true }
 );

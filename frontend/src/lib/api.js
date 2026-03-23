@@ -73,3 +73,29 @@ export const changePassword = async (passwordData) => {
   const response = await axiosInstance.put("/users/change-password", passwordData);
   return response.data;
 };
+
+// --- Posts API ---
+export const createPost = async (postData) => {
+  const response = await axiosInstance.post("/posts", postData);
+  return response.data;
+};
+
+export const getFeed = async () => {
+  const response = await axiosInstance.get("/posts/feed");
+  return response.data;
+};
+
+export const getUserPosts = async (userId) => {
+  const response = await axiosInstance.get(`/posts/user/${userId}`);
+  return response.data;
+};
+
+export const toggleLikePost = async (postId) => {
+  const response = await axiosInstance.put(`/posts/${postId}/like`);
+  return response.data;
+};
+
+export const commentOnPost = async ({ postId, text }) => {
+  const response = await axiosInstance.post(`/posts/${postId}/comment`, { text });
+  return response.data;
+};

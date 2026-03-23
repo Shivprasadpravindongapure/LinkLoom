@@ -152,7 +152,7 @@ export async function getOutgoingFriendReqs(req, res) {
 export async function updateProfile(req, res) {
   try {
     const userId = req.user._id;
-    const { fullName, bio, nativeLanguage, learningLanguage, location, image } = req.body;
+    const { fullName, bio, nativeLanguage, learningLanguage, location, image, interests, socialLinks } = req.body;
 
     let profilePic = req.user.profilePic;
 
@@ -169,6 +169,8 @@ export async function updateProfile(req, res) {
         nativeLanguage: nativeLanguage || req.user.nativeLanguage,
         learningLanguage: learningLanguage || req.user.learningLanguage,
         location: location || req.user.location,
+        interests: interests || req.user.interests,
+        socialLinks: socialLinks || req.user.socialLinks,
         profilePic,
       },
       { new: true }
